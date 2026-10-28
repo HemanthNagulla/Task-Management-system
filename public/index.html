@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="TaskMaster — Formal & Professional Task Management System">
+  <title>TaskMaster — Task Management System</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Local Bootstrap 5.3 CSS -->
+  <link rel="stylesheet" href="vendor/bootstrap/bootstrap.min.css">
+
+  <!-- Local Bootstrap Icons CSS -->
+  <link rel="stylesheet" href="vendor/bootstrap-icons/bootstrap-icons.min.css">
+
+  <!-- Compiled Tailwind CSS & SaaS Design System -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="bg-slate-50 min-vh-100 text-slate-900">
+
+  <!-- ================= OVERALL APP WRAPPER WITH SIDEBAR ================= -->
+  <div class="d-flex min-vh-100">
+
+    <!-- Left Sidebar (Desktop View) -->
+    <aside class="app-sidebar d-none d-lg-flex">
+      <div>
+        <!-- Sidebar Brand Logo -->
+        <a href="/" class="d-flex align-items-center gap-2.5 text-decoration-none mb-4 px-2">
+          <span class="brand-badge">
+            <i class="bi bi-check2-square"></i>
+          </span>
+          <span class="brand-title-sidebar">TaskManager</span>
+        </a>
+
+        <!-- Navigation Links -->
+        <nav class="sidebar-nav-list">
+          <a href="#" class="sidebar-link active">
+            <i class="bi bi-house-door-fill text-white"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="#tasksSectionHeading" class="sidebar-link">
+            <i class="bi bi-layers"></i>
+            <span>Tasks</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Bottom Links -->
+      <div class="sidebar-bottom-list">
+        <a href="#" class="sidebar-link-muted"
+          onclick="showToast('Settings panel available in next release', 'info'); return false;">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </a>
+        <a href="#" class="sidebar-link-muted" onclick="showToast('Session is active', 'info'); return false;">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Column -->
+    <div class="flex-grow-1 d-flex flex-column min-vh-100" style="min-width: 0;">
+
+      <!-- ================= TOP NAVIGATION BAR ================= -->
+      <header class="app-navbar">
+        <div class="py-2.5 px-3 px-sm-4 d-flex align-items-center justify-content-between">
+
+          <!-- Left: Mobile Brand & Active Tab -->
+          <div class="d-flex align-items-center gap-2 gap-sm-3">
+            <a href="/" class="d-flex d-lg-none align-items-center gap-2 text-decoration-none">
+              <span class="brand-badge">
+                <i class="bi bi-check2-square"></i>
+              </span>
+              <span class="fw-bold fs-5 text-slate-900 tracking-tight">Task<span
+                  class="text-primary">Master</span></span>
+            </a>
+
+            <div class="vr d-lg-none text-slate-300 mx-1" style="height: 18px;"></div>
+
+            <div class="nav-pill-active">
+              <i class="bi bi-grid-1x2-fill"></i>
+              <span>Dashboard</span>
+            </div>
+          </div>
+
+          <!-- Right: System Status, Date & Profile Avatar -->
+          <div class="d-flex align-items-center gap-2 gap-sm-3">
+            <!-- Live MySQL Connection Indicator -->
+            <div
+              class="d-flex align-items-center gap-2 px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-pill text-slate-600">
+              <span class="d-inline-block rounded-circle bg-success" style="width: 7px; height: 7px;"></span>
+              <span style="font-size: 0.775rem; font-weight: 500;">MySQL Connected</span>
+            </div>
+
+            <!-- SMS Provider Status Indicator -->
+            <div id="smsStatusBadge"
+              class="d-none d-md-flex align-items-center gap-2 px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-pill text-slate-600"
+              title="SMS Provider Configuration Status">
+              <span id="smsStatusDot" class="d-inline-block rounded-circle bg-amber-400" style="width: 7px; height: 7px;"></span>
+              <span id="smsStatusText" style="font-size: 0.775rem; font-weight: 500;">SMS: Checking...</span>
+            </div>
+
+            <div class="vr d-none d-sm-block text-slate-300" style="height: 18px;"></div>
+
+            <!-- Current Date Display -->
+            <div class="d-none d-sm-flex align-items-center gap-1.5 text-slate-500 small">
+              <i class="bi bi-calendar-event text-slate-400"></i>
+              <span id="currentDateDisplay">Wed, Oct 29, 2026</span>
+            </div>
+
+            <!-- User Profile Avatar Icon -->
+            <div class="nav-user-avatar" title="Signed in as Administrator">
+              <i class="bi bi-person-circle"></i>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ================= MAIN DASHBOARD BODY ================= -->
+      <main class="py-4 px-3 px-sm-4 flex-grow-1">
+
+        <!-- Global Notification Banner Area -->
+        <div id="globalNotificationArea" class="mb-3"></div>
+
+        <!-- Dashboard Header & Add Task Action -->
+        <section class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-4">
+          <div>
+            <h1 class="h3 fw-bold text-slate-900 mb-1 tracking-tight">Dashboard</h1>
+            <p class="text-slate-500 mb-0 small">Manage your tasks, track progress, and stay organized.</p>
+          </div>
+
+          <!-- Add New Task Primary Button -->
+          <div>
+            <button id="btnOpenAddModal" class="btn-primary-custom" type="button">
+              <i class="bi bi-plus-lg"></i>
+              <span>Add New Task</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Statistics Cards (3 Equal-Width Cards with Circular Icons) -->
+        <section class="stats-grid-row" id="statsSection" aria-label="Task Summary Statistics">
+
+          <!-- 1. Total Tasks -->
+          <div class="stat-card-clean">
+            <div class="stat-icon-circle bg-blue-50 text-blue-600 border border-blue-100">
+              <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="stat-card-body">
+              <div class="stat-header-row">
+                <span class="stat-label-text">Total Tasks</span>
+                <i class="bi bi-chevron-right text-slate-400 small"></i>
+              </div>
+              <div id="statTotalCount" class="stat-count-number">0</div>
+              <p class="stat-subtitle-text">All recorded tasks in MySQL</p>
+            </div>
+          </div>
+
+          <!-- 2. Pending Tasks -->
+          <div class="stat-card-clean">
+            <div class="stat-icon-circle bg-amber-50 text-amber-600 border border-amber-100">
+              <i class="bi bi-clock"></i>
+            </div>
+            <div class="stat-card-body">
+              <div class="stat-header-row">
+                <span class="stat-label-text">Pending Tasks</span>
+                <i class="bi bi-chevron-right text-slate-400 small"></i>
+              </div>
+              <div id="statPendingCount" class="stat-count-number" style="color: #d97706;">0</div>
+              <p class="stat-subtitle-text">Tasks currently awaiting action</p>
+            </div>
+          </div>
+
+          <!-- 3. Completed Tasks -->
+          <div class="stat-card-clean">
+            <div class="stat-icon-circle bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <i class="bi bi-check2-circle"></i>
+            </div>
+            <div class="stat-card-body">
+              <div class="stat-header-row">
+                <span class="stat-label-text">Completed Tasks</span>
+                <i class="bi bi-chevron-right text-slate-400 small"></i>
+              </div>
+              <div id="statCompletedCount" class="stat-count-number" style="color: #059669;">0</div>
+              <p class="stat-subtitle-text">Successfully finished objectives</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- My Tasks Toolbar: Search, Segmented Filters & Refresh -->
+        <section class="toolbar-card" id="tasksSectionHeading">
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+
+            <!-- Left: Title & Count Badge -->
+            <div class="d-flex align-items-center gap-2">
+              <h2 class="h5 fw-bold text-slate-900 mb-0">My Tasks</h2>
+              <span id="badgeVisibleCount"
+                class="badge bg-slate-100 text-slate-700 border border-slate-200 fw-semibold rounded-pill px-2.5 py-1"
+                style="font-size: 0.75rem;">0 tasks</span>
+            </div>
+
+            <!-- Right: Search, Status Filters, Refresh -->
+            <div class="d-flex flex-wrap align-items-center gap-2">
+
+              <!-- Search Input -->
+              <div class="search-control-wrap">
+                <i class="bi bi-search search-icon-left"></i>
+                <input type="text" id="searchInput" class="search-input-field" placeholder="Search tasks..."
+                  aria-label="Search tasks">
+                <button class="search-clear-btn d-none" type="button" id="btnClearSearch" title="Clear search">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+
+              <!-- Segmented Status Filter Tabs -->
+              <div class="filter-segmented-group" role="group" aria-label="Task status filter">
+                <button type="button" class="filter-tab-btn active" data-filter="all" id="filterBtnAll">
+                  <span>All (<span id="badgeFilterAll">0</span>)</span>
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="Pending" id="filterBtnPending">
+                  <span>Pending (<span id="badgeFilterPending">0</span>)</span>
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="Completed" id="filterBtnCompleted">
+                  <span>Completed (<span id="badgeFilterCompleted">0</span>)</span>
+                </button>
+              </div>
+
+              <!-- Refresh Button -->
+              <button type="button" class="btn-action-icon" id="btnRefreshTasks" title="Refresh tasks from MySQL">
+                <i class="bi bi-arrow-clockwise" id="refreshIcon"></i>
+              </button>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TASK CARDS GRID ================= -->
+
+        <!-- Loading State -->
+        <div id="loadingIndicator" class="card border border-slate-200 bg-white rounded-3 p-5 text-center d-none">
+          <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"
+            style="width: 2rem; height: 2rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="text-slate-500 small mb-0 fw-medium">Retrieving tasks from database...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="card border border-danger-subtle bg-white rounded-3 p-4 text-center d-none">
+          <div class="d-inline-flex p-2.5 rounded-circle bg-danger bg-opacity-10 text-danger mb-2">
+            <i class="bi bi-exclamation-octagon fs-4"></i>
+          </div>
+          <h6 class="fw-bold text-slate-900 mb-1" id="errorMessageHeading">Connection Issue</h6>
+          <p class="text-slate-500 small mb-3" id="errorMessageText">Could not communicate with the backend server or
+            MySQL database.</p>
+          <div>
+            <button type="button" class="btn btn-sm btn-outline-danger px-3" id="btnRetryLoad">
+              <i class="bi bi-arrow-repeat me-1"></i> Retry Connection
+            </button>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="card border border-slate-200 bg-white rounded-3 p-5 text-center d-none">
+          <div class="d-inline-flex p-3 rounded-circle bg-slate-100 text-slate-400 mb-3">
+            <i class="bi bi-clipboard2-check fs-2"></i>
+          </div>
+          <h5 class="fw-bold text-slate-900 mb-1" id="emptyStateHeading">No Tasks Found</h5>
+          <p class="text-slate-500 small mb-3" id="emptyStateMessage">Create your first task to get started.</p>
+          <div>
+            <button id="btnEmptyStateAdd" class="btn btn-primary btn-sm px-3 py-1.5 fw-medium">
+              <i class="bi bi-plus-lg me-1"></i> Create First Task
+            </button>
+          </div>
+        </div>
+
+        <!-- Clickable Task Cards Container (3 per row desktop, 2 tablet, 1 mobile) -->
+        <div id="tasksCardGrid" class="tasks-card-grid">
+          <!-- Dynamically populated cards -->
+        </div>
+
+      </main>
+
+      <!-- ================= APPLICATION FOOTER ================= -->
+      <footer class="bg-white border-top border-slate-200 py-3 mt-auto">
+        <div
+          class="px-3 px-sm-4 d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 text-slate-500 small">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold text-slate-700">TaskMaster</span>
+            <span>— Full-Stack Task Management System</span>
+          </div>
+          <div>
+            Node.js • Express • MySQL • Drizzle ORM • Bootstrap 5 • Tailwind CSS
+          </div>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. TASK DETAILS MODAL (Matching Center Modal in Design Reference) -->
+  <div class="modal fade" id="taskDetailsModal" tabindex="-1" aria-labelledby="taskDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 650px;">
+      <div class="modal-content border-0 shadow-lg rounded-3">
+
+        <!-- Modal Header -->
+        <div class="modal-header border-bottom border-slate-100 py-3 px-4">
+          <div class="d-flex align-items-center gap-2">
+            <span
+              class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-2 p-1.5"
+              style="font-size: 1rem;">
+              <i class="bi bi-clipboard-data-fill"></i>
+            </span>
+            <h5 class="modal-title fw-bold text-slate-900 fs-6 mb-0" id="taskDetailsModalLabel">Task Details</h5>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body p-4">
+          <!-- Task Title and Status Badge Header -->
+          <div class="d-flex align-items-start justify-content-between gap-2 mb-3">
+            <h4 class="fw-bold text-slate-900 mb-0 fs-5" id="detailsTaskTitle">Task Title</h4>
+            <span id="detailsTaskStatusBadge" class="badge-status-completed">Completed</span>
+          </div>
+
+          <!-- Metadata Key-Value List -->
+          <div class="mb-3">
+            <!-- Task ID -->
+            <div class="details-meta-row">
+              <div class="details-meta-label">
+                <i class="bi bi-hash text-slate-400"></i>
+                <span>Task ID</span>
+              </div>
+              <div class="details-meta-value fw-semibold" id="detailsTaskId">1</div>
+            </div>
+
+            <!-- Status -->
+            <div class="details-meta-row">
+              <div class="details-meta-label">
+                <i class="bi bi-clock-history text-slate-400"></i>
+                <span>Status</span>
+              </div>
+              <div class="details-meta-value" id="detailsStatusContainer">
+                <span id="detailsStatusBadge" class="badge-status-completed">Completed</span>
+              </div>
+            </div>
+
+            <!-- Created Date -->
+            <div class="details-meta-row">
+              <div class="details-meta-label">
+                <i class="bi bi-calendar3 text-slate-400"></i>
+                <span>Created Date</span>
+              </div>
+              <div class="details-meta-value text-slate-600" id="detailsCreatedDate">Oct 28, 2026, 09:00 PM</div>
+            </div>
+
+            <!-- Last Updated -->
+            <div class="details-meta-row">
+              <div class="details-meta-label">
+                <i class="bi bi-arrow-repeat text-slate-400"></i>
+                <span>Last Updated</span>
+              </div>
+              <div class="details-meta-value text-slate-600" id="detailsUpdatedDate">Oct 28, 2026, 09:15 PM</div>
+            </div>
+
+            <!-- Deadline Date -->
+            <div class="details-meta-row border-bottom-0">
+              <div class="details-meta-label">
+                <i class="bi bi-calendar-event text-rose-500"></i>
+                <span>Deadline</span>
+              </div>
+              <div class="details-meta-value" id="detailsDeadlineDate">
+                <span class="badge bg-slate-100 text-slate-600 border border-slate-200">Not Set</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div class="mb-3">
+            <div class="d-flex align-items-center gap-1.5 fw-semibold text-slate-800 small mb-1">
+              <i class="bi bi-card-text text-slate-400"></i>
+              <span>Description</span>
+            </div>
+            <div class="details-desc-box" id="detailsDescriptionBox">
+              Task description goes here...
+            </div>
+          </div>
+
+          <!-- Daily SMS Reminder Section -->
+          <div class="reminder-card-section">
+            <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="d-inline-flex p-1 rounded bg-blue-100 text-primary">
+                  <i class="bi bi-bell-fill"></i>
+                </span>
+                <span class="fw-semibold text-slate-900 small">Daily SMS Reminder</span>
+                <span id="detailsReminderBadge" class="badge bg-slate-200 text-slate-700">Disabled</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-primary btn-sm py-1 px-2.5 d-flex align-items-center gap-1"
+                  style="font-size: 0.775rem;" id="btnToggleReminderSettings">
+                  <i class="bi bi-sliders"></i>
+                  <span>Configure</span>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm py-1 px-2.5 d-flex align-items-center gap-1"
+                  style="font-size: 0.775rem;" id="btnSendTestSms">
+                  <span id="testSmsSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                  <i class="bi bi-send-fill" id="testSmsIcon"></i>
+                  <span id="testSmsText">Send Test SMS</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- SMS Provider & Trial Mode Status Banner -->
+            <div id="reminderModeBanner" class="mb-2 d-none"></div>
+
+            <!-- Reminder Summary View -->
+            <div id="detailsReminderSummary" class="small text-slate-600 py-1 border-top border-slate-200">
+              <div class="row g-2 pt-1">
+                <div class="col-sm-6">
+                  <span class="text-slate-400">Recipient Phone:</span>
+                  <strong class="text-slate-800 ms-1" id="detailsReminderPhone">—</strong>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-slate-400">Scheduled Time:</span>
+                  <strong class="text-slate-800 ms-1" id="detailsReminderTime">—</strong>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-slate-400">Timezone:</span>
+                  <span class="text-slate-700 ms-1" id="detailsReminderTimezone">Asia/Kolkata</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-slate-400">Recipient Consent:</span>
+                  <span class="badge bg-slate-100 text-slate-600 border border-slate-200 ms-1" id="detailsReminderConsent">Not Given</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Inline Reminder Edit Form (Hidden by default) -->
+            <form id="inlineReminderForm" class="d-none border-top border-slate-200 pt-2.5 mt-2">
+              <div class="alert alert-info py-1 px-2 mb-2 text-xs" style="font-size: 0.75rem;">
+                <i class="bi bi-info-circle me-1"></i>Configure automatic SMS reminder dispatched once daily while task is Pending.
+              </div>
+              <div class="row g-2 mb-2">
+                <div class="col-12">
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input" type="checkbox" id="inlineReminderEnabled">
+                    <label class="form-check-label fw-semibold text-slate-800 small" for="inlineReminderEnabled">
+                      Enable Daily SMS Reminders
+                    </label>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label text-slate-600 small mb-1">Recipient Number <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control form-control-sm" id="inlineReminderPhone" placeholder="+919876543210">
+                </div>
+                <div class="col-sm-3">
+                  <label class="form-label text-slate-600 small mb-1">Time (24h)</label>
+                  <input type="time" class="form-control form-control-sm" id="inlineReminderTime" value="09:00">
+                </div>
+                <div class="col-sm-3">
+                  <label class="form-label text-slate-600 small mb-1">Timezone</label>
+                  <select class="form-select form-select-sm" id="inlineReminderTimezone">
+                    <option value="Asia/Kolkata" selected>Asia/Kolkata</option>
+                    <option value="Asia/Dubai">Asia/Dubai</option>
+                    <option value="Europe/London">Europe/London</option>
+                    <option value="America/New_York">America/New_York</option>
+                    <option value="UTC">UTC</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="inlineReminderConsent">
+                    <label class="form-check-label text-slate-600 text-xs" for="inlineReminderConsent">
+                      I confirm the recipient has consented to receive automated daily reminders for this task.
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light btn-sm px-2.5 py-1 text-slate-600 border" id="btnCancelInlineReminder" style="font-size: 0.775rem;">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-sm px-3 py-1" id="btnSaveInlineReminder" style="font-size: 0.775rem;">Save Settings</button>
+              </div>
+            </form>
+
+            <!-- Delivery History Section -->
+            <div class="mt-3 pt-2.5 border-top border-slate-200">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-slate-800 fw-semibold" style="font-size: 0.8125rem;">
+                  <i class="bi bi-clock-history me-1 text-slate-400"></i>Delivery History
+                </span>
+                <button type="button" class="btn btn-link btn-sm p-0 text-slate-500 text-decoration-none" id="btnRefreshReminderHistory" title="Refresh delivery log" style="font-size: 0.75rem;">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Refresh History
+                </button>
+              </div>
+              <div id="reminderHistoryContainer" class="history-table-container">
+                <div class="p-3 text-center text-slate-400 small" id="reminderHistoryEmpty">
+                  No reminder delivery attempts recorded for this task yet.
+                </div>
+                <table class="table mb-0 d-none" id="reminderHistoryTable">
+                  <thead>
+                    <tr>
+                      <th>Date / Time</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                      <th>Recipient</th>
+                      <th>Details / Provider ID</th>
+                    </tr>
+                  </thead>
+                  <tbody id="reminderHistoryBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Action Footer -->
+        <div
+          class="modal-footer border-top border-slate-100 py-3 px-4 bg-slate-50 rounded-bottom-3 d-flex flex-wrap align-items-center justify-content-end gap-2">
+          <!-- Edit Task Button -->
+          <button type="button" class="btn btn-primary btn-sm px-3 fw-medium d-flex align-items-center gap-1.5"
+            id="btnDetailsEdit">
+            <i class="bi bi-pencil-square"></i>
+            <span>Edit Task</span>
+          </button>
+
+          <!-- Toggle Status Button -->
+          <button type="button"
+            class="btn btn-outline-secondary btn-sm px-3 fw-medium d-flex align-items-center gap-1.5"
+            id="btnDetailsToggleStatus">
+            <i class="bi bi-arrow-counterclockwise" id="detailsToggleIcon"></i>
+            <span id="detailsToggleText">Mark Pending</span>
+          </button>
+
+          <!-- Delete Button -->
+          <button type="button" class="btn btn-outline-danger btn-sm px-3 fw-medium d-flex align-items-center gap-1.5"
+            id="btnDetailsDelete">
+            <i class="bi bi-trash3"></i>
+            <span>Delete</span>
+          </button>
+
+          <!-- Close Button -->
+          <button type="button" class="btn btn-light btn-sm px-3 fw-medium text-slate-700 border"
+            data-bs-dismiss="modal">
+            Close
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. ADD / EDIT TASK MODAL -->
+  <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true"
+    data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg rounded-3">
+        <div class="modal-header border-bottom border-slate-100 py-3 px-4">
+          <h5 class="modal-title fw-bold text-slate-900 fs-6 d-flex align-items-center gap-2" id="taskModalLabel">
+            <i class="bi bi-plus-circle text-primary" id="taskModalIcon"></i>
+            <span id="taskModalTitleText">Add New Task</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form id="taskForm" novalidate>
+          <div class="modal-body p-4">
+            <div id="modalAlertArea" class="mb-3"></div>
+
+            <input type="hidden" id="taskIdInput">
+
+            <!-- Title Field (Required) -->
+            <div class="mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label for="taskTitleInput" class="form-label fw-semibold text-slate-700 small mb-0">
+                  Task Title <span class="text-danger">*</span>
+                </label>
+                <span class="text-slate-400 text-xs" id="titleCharCount">0 / 255</span>
+              </div>
+              <input type="text" class="form-control rounded-2 text-slate-900" id="taskTitleInput"
+                placeholder="e.g. Prepare system presentation deck" maxlength="255" required
+                style="font-size: 0.875rem;">
+              <div class="invalid-feedback small" id="titleError">
+                Please provide a valid task title (1–255 characters).
+              </div>
+            </div>
+
+            <!-- Description Field (Optional) -->
+            <div class="mb-3">
+              <label for="taskDescInput" class="form-label fw-semibold text-slate-700 small mb-1">
+                Description <span class="text-slate-400 fw-normal">(Optional)</span>
+              </label>
+              <textarea class="form-control rounded-2 text-slate-900" id="taskDescInput" rows="3"
+                placeholder="Add relevant details, deadlines, or requirements..."
+                style="font-size: 0.875rem;"></textarea>
+            </div>
+
+            <!-- Deadline Date Field (Optional) -->
+            <div class="mb-3">
+              <label for="taskDeadlineInput"
+                class="form-label fw-semibold text-slate-700 small mb-1 d-flex align-items-center gap-1.5">
+                <i class="bi bi-calendar-event text-primary"></i>
+                <span>Deadline Date <span class="text-slate-400 fw-normal">(Optional)</span></span>
+              </label>
+              <input type="date" class="form-control rounded-2 text-slate-900" id="taskDeadlineInput"
+                style="font-size: 0.875rem;">
+            </div>
+
+            <!-- Status Field -->
+            <div class="mb-3">
+              <label for="taskStatusSelect" class="form-label fw-semibold text-slate-700 small mb-1">Status</label>
+              <select class="form-select rounded-2 text-slate-900" id="taskStatusSelect" style="font-size: 0.875rem;">
+                <option value="Pending" selected>Pending</option>
+                <option value="Completed">Completed</option>
+              </select>
+            </div>
+
+            <!-- SMS Reminder Section (Add/Edit Task) -->
+            <div class="border border-slate-200 rounded-3 p-3 bg-slate-50 mb-1">
+              <div class="d-flex align-items-center justify-content-between">
+                <label class="form-check-label fw-semibold text-slate-800 small d-flex align-items-center gap-2 mb-0" for="taskReminderEnabled">
+                  <i class="bi bi-bell-fill text-primary"></i>
+                  <span>Daily SMS Reminder</span>
+                </label>
+                <div class="form-check form-switch m-0">
+                  <input class="form-check-input" type="checkbox" id="taskReminderEnabled">
+                </div>
+              </div>
+
+              <!-- Collapsible reminder fields -->
+              <div id="taskReminderFields" class="d-none pt-2.5 mt-2 border-top border-slate-200">
+                <div class="mb-2">
+                  <label for="taskReminderPhone" class="form-label text-slate-700 small mb-1 fw-semibold">
+                    Recipient Mobile Number <span class="text-danger">*</span>
+                  </label>
+                  <input type="tel" class="form-control rounded-2 text-slate-900" id="taskReminderPhone"
+                    placeholder="+919876543210" style="font-size: 0.875rem;">
+                  <div class="form-text text-xs text-slate-400">
+                    Include country code in E.164 format (e.g. +91 for India).
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-sm-6">
+                    <label for="taskReminderTime" class="form-label text-slate-700 small mb-1 fw-semibold">Reminder Time</label>
+                    <input type="time" class="form-control rounded-2 text-slate-900" id="taskReminderTime" value="09:00" style="font-size: 0.875rem;">
+                  </div>
+                  <div class="col-sm-6">
+                    <label for="taskReminderTimezone" class="form-label text-slate-700 small mb-1 fw-semibold">Timezone</label>
+                    <select class="form-select rounded-2 text-slate-900" id="taskReminderTimezone" style="font-size: 0.875rem;">
+                      <option value="Asia/Kolkata" selected>Asia/Kolkata (IST)</option>
+                      <option value="Asia/Dubai">Asia/Dubai (GST)</option>
+                      <option value="Europe/London">Europe/London (GMT/BST)</option>
+                      <option value="America/New_York">America/New_York (EST/EDT)</option>
+                      <option value="UTC">UTC</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" id="taskReminderConsent">
+                  <label class="form-check-label text-slate-600 text-xs" for="taskReminderConsent">
+                    I confirm recipient consent to receive automated SMS notifications for this task.
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="modal-footer border-top border-slate-100 py-2.5 px-4 bg-slate-50 rounded-bottom-3 d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light btn-sm px-3 fw-medium text-slate-700 border"
+              data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary btn-sm px-3 fw-medium d-flex align-items-center gap-1.5"
+              id="btnSaveTask">
+              <span id="saveSpinner" class="spinner-border spinner-border-sm d-none" role="status"
+                aria-hidden="true"></span>
+              <span id="saveBtnText">Save Task</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. DELETE CONFIRMATION MODAL -->
+  <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 shadow-lg rounded-3">
+        <div class="modal-body text-center p-4">
+          <div class="d-inline-flex p-3 rounded-circle bg-danger bg-opacity-10 text-danger mb-3">
+            <i class="bi bi-trash3-fill fs-3"></i>
+          </div>
+          <h6 class="fw-bold text-slate-900 mb-1" id="deleteModalLabel">Delete Task?</h6>
+          <p class="text-slate-500 small mb-3">
+            Are you sure you want to permanently delete <strong id="deleteTaskTitleDisplay" class="text-slate-900">this
+              task</strong> from MySQL?
+          </p>
+          <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-light btn-sm px-3 border text-slate-700 fw-medium"
+              data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger btn-sm px-3 fw-medium d-flex align-items-center gap-1.5"
+              id="btnConfirmDelete">
+              <span id="deleteSpinner" class="spinner-border spinner-border-sm d-none" role="status"
+                aria-hidden="true"></span>
+              <span id="deleteBtnText">Delete</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FLOATING TOAST NOTIFICATION -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div id="liveToast" class="toast align-items-center border-0 shadow-lg text-white" role="alert"
+      aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
+          <i class="bi bi-check-circle-fill" id="toastIcon"></i>
+          <span id="toastText" style="font-size: 0.85rem;">Action completed successfully.</span>
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+          aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Local Bootstrap 5.3 JS Bundle -->
+  <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
+
+  <!-- Application Logic (Vanilla JS) -->
+  <script src="app.js"></script>
+</body>
+
+</html>
